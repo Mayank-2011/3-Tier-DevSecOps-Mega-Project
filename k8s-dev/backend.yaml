@@ -1,29 +1,8 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: backend-secret
-  labels:
-    app: backend
-stringData:
-  DB_PASSWORD: Aditya
-  JWT_SECRET: devopsShackSuperSecretKey
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend-config
-  labels:
-    app: backend
-data:
-  DB_HOST: mysql
-  DB_USER: root
-  DB_NAME: crud_app
-  RESET_ADMIN_PASS: "true"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
+  namespace: dev
 spec:
   replicas: 1
   selector:
@@ -36,50 +15,42 @@ spec:
     spec:
       containers:
         - name: backend
-          # UPDATED: Matches the variable 'BACKEND_IMAGE_URI' from your Jenkinsfile
-          image: ${BACKEND_IMAGE_URI}
-          ports:
-            - containerPort: 5000
+          image: ${BACKEND_IMAGE_URI} 
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "50m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
           env:
             - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: DB_HOST
+              value: "mysql"
             - name: DB_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: DB_USER
-            - name: DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: DB_NAME
-            - name: RESET_ADMIN_PASS
-              valueFrom:
-                configMapKeyRef:
-                  name: backend-config
-                  key: RESET_ADMIN_PASS
+              value: "root"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: backend-secret
-                  key: DB_PASSWORD
-            - name: JWT_SECRET
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+            - name: DB_NAME
               valueFrom:
-                secretKeyRef:
-                  name: backend-secret
-                  key: JWT_SECRET
+                configMapKeyRef:
+                  name: mysql-config
+                  key: MYSQL_DATABASE
+          ports:
+            - containerPort: 5000
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend
+  namespace: dev
 spec:
-  type: LoadBalancer
   selector:
     app: backend
   ports:
     - port: 5000
       targetPort: 5000
+  type: ClusterIP
