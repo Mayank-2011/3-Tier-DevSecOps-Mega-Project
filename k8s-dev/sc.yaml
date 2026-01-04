@@ -1,10 +1,10 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: gce-pd-sc  # I renamed this from 'ebs-sc' to match the cloud provider
+  name: gce-pd-sc
 provisioner: pd.csi.storage.gke.io
 parameters:
   type: pd-balanced
-  fsType: ext4
+  # Note: fsType is removed as it is auto-handled by the GKE driver
 reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
