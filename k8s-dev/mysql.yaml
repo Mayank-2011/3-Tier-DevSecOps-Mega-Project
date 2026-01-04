@@ -41,22 +41,8 @@ data:
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: mysql-pv
-  labels:
-    app: mysql
-spec:
-  capacity:
-    storage: 5Gi
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-sc
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /mnt/data/mysql
+# REMOVED: Manual PersistentVolume (PV) block.
+# GKE will automatically create the PV when the PVC (below) requests it.
 
 ---
 apiVersion: v1
@@ -66,7 +52,8 @@ metadata:
   labels:
     app: mysql
 spec:
-  storageClassName: ebs-sc
+  # CHANGED: Points to the GKE storage class defined earlier
+  storageClassName: gce-pd-sc
   accessModes:
     - ReadWriteOnce
   resources:
