@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: adijaiswal/frontend:latest
+          # UPDATED: Matches the variable 'FRONTEND_IMAGE_URI' from your Jenkinsfile
+          image: ${FRONTEND_IMAGE_URI}
           ports:
             - containerPort: 80
 ---
