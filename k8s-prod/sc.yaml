@@ -1,7 +1,10 @@
-apiVersion: storage.k8s.io/v1 
+apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: ebs-sc
-provisioner: ebs.csi.aws.com
-volumeBindingMode: WaitForFirstConsumer
+  name: gce-pd-sc
+provisioner: pd.csi.storage.gke.io
+parameters:
+  type: pd-balanced
+  # Note: fsType is removed as it is auto-handled by the GKE driver
 reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
