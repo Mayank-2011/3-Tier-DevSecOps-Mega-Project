@@ -36,7 +36,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: adijaiswal/backend:latest
+          # UPDATED: Matches the variable 'BACKEND_IMAGE_URI' from your Jenkinsfile
+          image: ${BACKEND_IMAGE_URI}
           ports:
             - containerPort: 5000
           env:
